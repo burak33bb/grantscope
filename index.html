@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="GrantScope checks GenLayer submission readiness with a deployed contract."
+    />
+    <title>grantscope</title>
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <div class="brand">
+          <span>gs</span>
+          <div>
+            <strong>grantscope</strong>
+            <small>submission readiness</small>
+          </div>
+        </div>
+        <div class="wallet-row">
+          <span id="status-pill">contract pending</span>
+          <span id="wallet-state">not connected</span>
+          <button id="connect-wallet" type="button">connect</button>
+          <button id="disconnect-wallet" class="ghost" type="button" hidden>
+            disconnect
+          </button>
+        </div>
+      </header>
+
+      <section class="main-grid">
+        <form id="review-form" class="panel form-panel">
+          <div class="section-head">
+            <span>review</span>
+            <h1>check before submit</h1>
+          </div>
+
+          <label>
+            category
+            <select id="category">
+              <option value="PROJECT">project</option>
+              <option value="INTELLIGENT_CONTRACT">intelligent contract</option>
+              <option value="MILESTONE">milestone</option>
+            </select>
+          </label>
+
+          <label>
+            project name
+            <input id="project-name" value="PolicyDrift Monitor" />
+          </label>
+
+          <label>
+            short summary
+            <textarea id="summary" rows="4">A GenLayer project app that connects a wallet, submits a real contract transaction, and reads an onchain readiness result.</textarea>
+          </label>
+
+          <div class="two-col">
+            <label>
+              website
+              <input id="website-url" value="https://policy-drift-monitor.vercel.app" />
+            </label>
+            <label>
+              github
+              <input id="github-url" value="https://github.com/burak33bb/policy-drift-monitor" />
+            </label>
+          </div>
+
+          <div class="two-col">
+            <label>
+              contract
+              <input id="contract-url" value="https://explorer-studio.genlayer.com/address/0x9fc13E4d554Ac9802ecaE7FA0e31945dc4Ae9Cd4" />
+            </label>
+            <label>
+              demo
+              <input id="demo-url" placeholder="https://youtube.com/..." />
+            </label>
+          </div>
+
+          <div class="actions">
+            <button id="submit-review" type="submit">submit review</button>
+            <button id="read-latest" class="secondary" type="button">read latest</button>
+          </div>
+        </form>
+
+        <aside class="panel result-panel">
+          <div class="section-head">
+            <span>result</span>
+            <h2 id="result-label">not reviewed</h2>
+          </div>
+          <p id="result-reason">deploy the contract, then run a review.</p>
+          <div class="score-card">
+            <span>score</span>
+            <strong id="score-value">-</strong>
+          </div>
+          <div class="missing-box">
+            <span>missing</span>
+            <ul id="missing-list">
+              <li>no report yet</li>
+            </ul>
+          </div>
+        </aside>
+      </section>
+
+      <section class="lower-grid">
+        <article class="panel">
+          <div class="section-head slim">
+            <span>transaction</span>
+            <h2 id="tx-title">idle</h2>
+          </div>
+          <a id="tx-link" class="tx-link" target="_blank" rel="noreferrer" hidden>
+            view tx
+          </a>
+          <pre id="tx-output">connect wallet after contract deploy.</pre>
+        </article>
+
+        <article class="panel">
+          <div class="section-head slim">
+            <span>contract response</span>
+            <h2>latest report</h2>
+          </div>
+          <pre id="raw-output">{}</pre>
+        </article>
+      </section>
+
+      <footer class="proof-strip">
+        <span id="network-label"></span>
+        <code id="contract-address">contract pending</code>
+        <a id="contract-link" target="_blank" rel="noreferrer" hidden>contract</a>
+        <a
+          href="https://github.com/burak33bb/grantscope"
+          target="_blank"
+          rel="noreferrer"
+        >
+          github
+        </a>
+      </footer>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
