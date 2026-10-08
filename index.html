@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="GrantScope checks GenLayer submission readiness with a deployed contract."
+      content="GrantScope records a GenLayer evidence checklist before submission."
     />
     <title>grantscope</title>
   </head>
@@ -16,7 +16,7 @@
           <span>gs</span>
           <div>
             <strong>grantscope</strong>
-            <small>submission readiness</small>
+            <small>evidence checklist</small>
           </div>
         </div>
         <div class="wallet-row">
@@ -32,8 +32,8 @@
       <section class="main-grid">
         <form id="review-form" class="panel form-panel">
           <div class="section-head">
-            <span>review</span>
-            <h1>check before submit</h1>
+            <span>checklist</span>
+            <h1>check evidence</h1>
           </div>
 
           <label>
@@ -52,7 +52,7 @@
 
           <label>
             short summary
-            <textarea id="summary" rows="4">A GenLayer project app that connects a wallet, submits a real contract transaction, and reads an onchain readiness result.</textarea>
+            <textarea id="summary" rows="4">A GenLayer project app that connects a wallet, submits a real contract transaction, and shows the stored contract response.</textarea>
           </label>
 
           <div class="two-col">
@@ -78,7 +78,7 @@
           </div>
 
           <div class="actions">
-            <button id="submit-review" type="submit">submit review</button>
+            <button id="submit-review" type="submit">submit checklist</button>
             <button id="read-latest" class="secondary" type="button">read latest</button>
           </div>
         </form>
@@ -88,7 +88,7 @@
             <span>result</span>
             <h2 id="result-label">not reviewed</h2>
           </div>
-          <p id="result-reason">deploy the contract, then run a review.</p>
+          <p id="result-reason">submit a checklist to store evidence status onchain.</p>
           <div class="score-card">
             <span>score</span>
             <strong id="score-value">-</strong>

@@ -98,7 +98,7 @@ async function submitReview(event) {
 
   try {
     nodes.submit.disabled = true;
-    setTx("signing", "confirm review_submission in your wallet.");
+    setTx("signing", "confirm the checklist transaction in your wallet.");
     const args = collectArgs();
     const hash = await writeClient.writeContract({
       address: CONTRACT_ADDRESS,

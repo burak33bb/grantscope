@@ -6,11 +6,11 @@ import typing
 
 from genlayer import *
 
-READY = "READY"
+EVIDENCE_READY = "EVIDENCE_READY"
 NEEDS_MORE_EVIDENCE = "NEEDS_MORE_EVIDENCE"
 CATEGORY_RISK = "CATEGORY_RISK"
 WEAK_PROOF = "WEAK_PROOF"
-VALID_RESULTS = [READY, NEEDS_MORE_EVIDENCE, CATEGORY_RISK, WEAK_PROOF]
+VALID_RESULTS = [EVIDENCE_READY, NEEDS_MORE_EVIDENCE, CATEGORY_RISK, WEAK_PROOF]
 VALID_CATEGORIES = ["PROJECT", "INTELLIGENT_CONTRACT", "MILESTONE"]
 
 
@@ -62,13 +62,13 @@ class GrantScopeVerifier(gl.Contract):
             proof_score,
         )
 
-        if proof_score < 3 and report["result"] == READY:
-            raise ValueError("READY requires stronger deterministic proof coverage.")
-        if category == "PROJECT" and not website_url and report["result"] == READY:
-            raise ValueError("READY project requires a website.")
+        if proof_score < 3 and report["result"] == EVIDENCE_READY:
+            raise ValueError("EVIDENCE_READY requires stronger deterministic proof coverage.")
+        if category == "PROJECT" and not website_url and report["result"] == EVIDENCE_READY:
+            raise ValueError("EVIDENCE_READY project requires a website.")
         if contract_url and "explorer-studio.genlayer.com/address/" not in contract_url:
-            if report["result"] == READY:
-                raise ValueError("READY requires a GenLayer explorer contract URL.")
+            if report["result"] == EVIDENCE_READY:
+                raise ValueError("EVIDENCE_READY requires a GenLayer explorer contract URL.")
 
         next_count = int(self.report_count) + 1
         record = {
@@ -81,6 +81,7 @@ class GrantScopeVerifier(gl.Contract):
             "demo_url": demo_url,
             "website_url": website_url,
             "report": report,
+            "scope": "Evidence checklist only; external page contents are not fetched or authenticated.",
         }
         self.latest_report = _canonical_json(record)
         self.report_count = u256(next_count)
@@ -201,8 +202,8 @@ def _build_readiness_report(
         result = WEAK_PROOF
         reason = "The contract proof is not a GenLayer explorer address."
     elif score >= 75:
-        result = READY
-        reason = "Core proof is present: source, contract, app, and enough context."
+        result = EVIDENCE_READY
+        reason = "Required evidence links are present and formatted for steward review."
     else:
         result = NEEDS_MORE_EVIDENCE
         reason = "The submission is understandable but still needs stronger review evidence."
@@ -215,6 +216,7 @@ def _build_readiness_report(
         "score": score,
         "missing": missing,
         "reason": reason,
+        "scope": "Checks link presence and format only; it does not verify external page contents.",
     }
 
 
