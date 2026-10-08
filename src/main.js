@@ -124,7 +124,14 @@ async function submitReview(event) {
       return;
     }
     setTx("finalized", `transaction finalized.\n${hash}`);
-    await readLatest();
+    await wait(1800);
+    const report = await readLatest();
+    if (!report || Object.keys(report).length === 0) {
+      setTx(
+        "not stored",
+        `transaction finalized, but no report was stored.\ncheck the contract execution in explorer:\n${hash}`,
+      );
+    }
   } catch (error) {
     setTx("failed", error.message.toLowerCase());
   } finally {
@@ -136,17 +143,49 @@ async function readLatest() {
   if (!isReady()) return;
   try {
     nodes.status.textContent = "reading";
-    const result = await readClient.readContract({
+    const result = await readLatestReport();
+    renderReport(result);
+    nodes.status.textContent = "contract read";
+    return result;
+  } catch (error) {
+    setTx("read failed", error.message.toLowerCase());
+    return {};
+  }
+}
+
+async function readLatestReport() {
+  const latest = normalizeReport(
+    await readClient.readContract({
       address: CONTRACT_ADDRESS,
       functionName: "get_latest_report",
       args: [],
       stateStatus: "finalized",
-    });
-    renderReport(normalizeReport(result));
-    nodes.status.textContent = "contract read";
-  } catch (error) {
-    setTx("read failed", error.message.toLowerCase());
+    }),
+  );
+  if (latest && Object.keys(latest).length > 0) {
+    return latest;
   }
+
+  const count = Number(
+    await readClient.readContract({
+      address: CONTRACT_ADDRESS,
+      functionName: "get_report_count",
+      args: [],
+      stateStatus: "finalized",
+    }),
+  );
+  if (!count) {
+    return {};
+  }
+
+  return normalizeReport(
+    await readClient.readContract({
+      address: CONTRACT_ADDRESS,
+      functionName: "get_report",
+      args: [count],
+      stateStatus: "finalized",
+    }),
+  );
 }
 
 function collectArgs() {
@@ -256,4 +295,10 @@ function normalizeReport(result) {
 
 function formatBigInt(_key, value) {
   return typeof value === "bigint" ? value.toString() : value;
+}
+
+function wait(ms) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
 }

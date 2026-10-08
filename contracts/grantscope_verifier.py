@@ -52,8 +52,7 @@ class GrantScopeVerifier(gl.Contract):
 
         proof_score = _proof_score(github_url, contract_url, demo_url, website_url)
 
-        def classify_submission() -> str:
-            result = gl.exec_prompt(f"""
+        result = gl.exec_prompt(f"""
 Review this GenLayer submission for readiness.
 
 Category: {category}
@@ -79,19 +78,16 @@ Rules:
 - WEAK_PROOF means links exist but do not clearly prove GenLayer usage.
 - score must be an integer from 0 to 100.
             """)
-            value = _parse_json_dict(result)
-            _validate_report(value)
-            return _canonical_json(value)
-
-        agreed = gl.eq_principle_prompt_comparative(
-            classify_submission,
-            principle="The result, score, missing items, and reason must match the submitted category and proof links.",
-        )
-        report = _parse_json_dict(agreed)
+        report = _parse_json_dict(result)
         _validate_report(report)
 
         if proof_score < 3 and report["result"] == READY:
             raise ValueError("READY requires stronger deterministic proof coverage.")
+        if category == "PROJECT" and not website_url and report["result"] == READY:
+            raise ValueError("READY project requires a website.")
+        if contract_url and "explorer-studio.genlayer.com/address/" not in contract_url:
+            if report["result"] == READY:
+                raise ValueError("READY requires a GenLayer explorer contract URL.")
 
         next_count = int(self.report_count) + 1
         record = {
@@ -118,6 +114,12 @@ Rules:
     @gl.public.view
     def get_report_count(self) -> int:
         return int(self.report_count)
+
+    @gl.public.view
+    def get_report(self, report_id: int) -> typing.Any:
+        if report_id != int(self.report_count) or not self.latest_report:
+            raise ValueError("Only the latest report is stored.")
+        return json.loads(self.latest_report)
 
 
 def _validate_inputs(
