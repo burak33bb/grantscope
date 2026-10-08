@@ -52,34 +52,15 @@ class GrantScopeVerifier(gl.Contract):
 
         proof_score = _proof_score(github_url, contract_url, demo_url, website_url)
 
-        result = gl.exec_prompt(f"""
-Review this GenLayer submission for readiness.
-
-Category: {category}
-Project: {project_name}
-Summary: {summary}
-GitHub: {github_url}
-Contract: {contract_url}
-Demo: {demo_url}
-Website: {website_url}
-
-Return only JSON:
-{{
-  "result": "READY | NEEDS_MORE_EVIDENCE | CATEGORY_RISK | WEAK_PROOF",
-  "score": 0,
-  "missing": ["short missing item"],
-  "reason": "short practical reason"
-}}
-
-Rules:
-- READY means category, source, contract proof, and demo evidence are enough to review.
-- NEEDS_MORE_EVIDENCE means useful proof is missing.
-- CATEGORY_RISK means the category appears mismatched.
-- WEAK_PROOF means links exist but do not clearly prove GenLayer usage.
-- score must be an integer from 0 to 100.
-            """)
-        report = _parse_json_dict(result)
-        _validate_report(report)
+        report = _build_readiness_report(
+            category,
+            summary,
+            github_url,
+            contract_url,
+            demo_url,
+            website_url,
+            proof_score,
+        )
 
         if proof_score < 3 and report["result"] == READY:
             raise ValueError("READY requires stronger deterministic proof coverage.")
@@ -170,6 +151,71 @@ def _proof_score(
         if _looks_like_url(url):
             score += 1
     return score
+
+
+def _build_readiness_report(
+    category: str,
+    summary: str,
+    github_url: str,
+    contract_url: str,
+    demo_url: str,
+    website_url: str,
+    proof_score: int,
+) -> dict:
+    missing = []
+    score = 0
+
+    if _looks_like_url(github_url) and "github.com" in github_url.lower():
+        score += 25
+    else:
+        missing.append("github repository")
+
+    if _looks_like_url(contract_url) and "explorer-studio.genlayer.com/address/" in contract_url:
+        score += 30
+    else:
+        missing.append("genlayer explorer contract")
+
+    if category == "PROJECT":
+        if _looks_like_url(website_url):
+            score += 25
+        else:
+            missing.append("project website")
+    elif _looks_like_url(website_url):
+        score += 10
+
+    if _looks_like_url(demo_url):
+        score += 15
+    else:
+        missing.append("working demo video")
+
+    if len(summary) >= 90:
+        score += 5
+
+    if proof_score < 2:
+        result = WEAK_PROOF
+        reason = "Too few usable proof links were provided."
+    elif category == "PROJECT" and not _looks_like_url(website_url):
+        result = CATEGORY_RISK
+        reason = "Project submissions need a live app URL."
+    elif "explorer-studio.genlayer.com/address/" not in contract_url:
+        result = WEAK_PROOF
+        reason = "The contract proof is not a GenLayer explorer address."
+    elif score >= 75:
+        result = READY
+        reason = "Core proof is present: source, contract, app, and enough context."
+    else:
+        result = NEEDS_MORE_EVIDENCE
+        reason = "The submission is understandable but still needs stronger review evidence."
+
+    if not missing:
+        missing = ["none"]
+
+    return {
+        "result": result,
+        "score": score,
+        "missing": missing,
+        "reason": reason,
+    }
 
 
 def _looks_like_url(value: str) -> bool:
