@@ -12,6 +12,7 @@
 }
 
 body {
+  overflow-x: hidden;
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
@@ -144,11 +145,12 @@ pre {
 }
 
 .lower-grid {
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   margin-top: 12px;
 }
 
 .panel {
+  min-width: 0;
   border: 1px solid rgba(240, 234, 223, 0.1);
   border-radius: 24px;
   padding: 18px;
@@ -271,6 +273,8 @@ ul {
 }
 
 pre {
+  width: 100%;
+  max-width: 100%;
   min-height: 160px;
   max-height: 310px;
   margin: 0;
@@ -283,6 +287,7 @@ pre {
   font-size: 0.72rem;
   line-height: 1.5;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .proof-strip {

@@ -123,7 +123,7 @@ async function submitReview(event) {
       nodes.status.textContent = "execution failed";
       return;
     }
-    setTx("finalized", JSON.stringify(receipt, formatBigInt, 2));
+    setTx("finalized", `transaction finalized.\n${hash}`);
     await readLatest();
   } catch (error) {
     setTx("failed", error.message.toLowerCase());
